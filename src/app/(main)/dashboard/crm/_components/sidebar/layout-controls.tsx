@@ -11,12 +11,7 @@ import { updateContentLayout, updateNavbarStyle } from "@/lib/layout-utils";
 import { updateThemeMode, updateThemePreset } from "@/lib/theme-utils";
 import { setValueToCookie } from "@/server/server-actions";
 import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
-import {
-  CONTENT_LAYOUT_VALUES,
-  NAVBAR_STYLE_VALUES,
-  SIDEBAR_COLLAPSIBLE_VALUES,
-  SIDEBAR_VARIANT_VALUES,
-} from "@/types/preferences/layout";
+import type { SidebarVariant, SidebarCollapsible, ContentLayout, NavbarStyle } from "@/types/preferences/layout";
 import { THEME_PRESET_OPTIONS, THEME_PRESET_VALUES, type ThemePreset, type ThemeMode } from "@/types/preferences/theme";
 
 // Type Guards
