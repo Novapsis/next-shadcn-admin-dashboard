@@ -1,47 +1,96 @@
 "use client";
 
-import { Download } from "lucide-react";
+import * as React from "react";
 
-import { DataTable } from "@/components/data-table/data-table";
-import { DataTablePagination } from "@/components/data-table/data-table-pagination";
-import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
+import {
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardAction } from "@/components/ui/card";
-import { useDataTableInstance } from "@/hooks/use-data-table-instance";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Lead } from "@/types/supabase";
 
 import { recentLeadsColumns } from "./columns.crm";
-import { recentLeadsData } from "./crm.config";
 
-export function TableCards() {
-  const table = useDataTableInstance({
-    data: recentLeadsData,
+interface TableCardsProps {
+  leads: Lead[];
+}
+
+export function TableCards({ leads }: TableCardsProps) {
+  const table = useReactTable({
+    data: leads,
     columns: recentLeadsColumns,
-    getRowId: (row) => row.id.toString(),
+    // Let the table manage its own state
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
 
   return (
-    <div className="grid grid-cols-1 gap-4 *:data-[slot=card]:shadow-xs">
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Leads</CardTitle>
-          <CardDescription>Track and manage your latest leads and their status.</CardDescription>
-          <CardAction>
-            <div className="flex items-center gap-2">
-              <DataTableViewOptions table={table} />
-              <Button variant="outline" size="sm">
-                <Download />
-                <span className="hidden lg:inline">Export</span>
-              </Button>
-            </div>
-          </CardAction>
-        </CardHeader>
-        <CardContent className="flex size-full flex-col gap-4">
-          <div className="overflow-hidden rounded-md border">
-            <DataTable table={table} columns={recentLeadsColumns} />
-          </div>
-          <DataTablePagination table={table} />
-        </CardContent>
-      </Card>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Leads Recientes</CardTitle>
+        <CardDescription>Rastrea y gestiona tus últimos leads y su estado.</CardDescription>
+      </CardHeader>
+      <CardContent className="flex size-full flex-col gap-4">
+        <div className="overflow-hidden rounded-md border">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={recentLeadsColumns.length} className="h-24 text-center">
+                    Sin resultados.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        {/* Manual Pagination Controls */}
+        <div className="flex items-center justify-end space-x-2 py-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Anterior
+          </Button>
+          <span>
+            Página{" "}
+            <strong>
+              {table.getState().pagination.pageIndex + 1} de {table.getPageCount()}
+            </strong>
+          </span>
+          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+            Siguiente
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

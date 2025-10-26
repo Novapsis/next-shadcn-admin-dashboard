@@ -1,10 +1,10 @@
 import z from "zod";
 
-export const recentLeadSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  company: z.string(),
-  status: z.string(),
-  source: z.string(),
-  lastActivity: z.string(),
+export const leadSchema = z.object({
+  lead_id: z.string(),
+  nombre_empresa: z.string().nullable(),
+  email: z.string().email().nullable(),
+  status: z.string().nullable(),
+  timestamp_registro: z.string(),
+  pais: z.string().nullable(),
 });

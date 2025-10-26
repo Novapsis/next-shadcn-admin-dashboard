@@ -1,74 +1,71 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { EllipsisVertical } from "lucide-react";
-import z from "zod";
 
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Lead } from "@/types/supabase";
 
-import { recentLeadSchema } from "./schema";
+import { LeadDetailsModal } from "./lead-details-modal"; // Import the new modal
 
-export const recentLeadsColumns: ColumnDef<z.infer<typeof recentLeadSchema>>[] = [
+const channelColorMap: { [key: string]: string } = {
+  Whatsapp: "oklch(0.65 0.2 145)",
+  Instagram: "oklch(0.7 0.22 320)",
+  Linkedin: "oklch(0.5 0.15 260)",
+  Facebook: "oklch(0.67 0.14 205)",
+  X: "oklch(0.73 0.2 50)",
+};
+const defaultColor = "oklch(0.7 0.1 200)"; // A default muted blue
+
+export const recentLeadsColumns: ColumnDef<Lead>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      </div>
-    ),
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      </div>
-    ),
+    id: "view",
+    header: () => null, // Add empty header
+    cell: ({ row }) => <LeadDetailsModal lead={row.original} />,
     enableSorting: false,
     enableHiding: false,
   },
   {
-    accessorKey: "id",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Ref" />,
-    cell: ({ row }) => <span className="tabular-nums">{row.original.id}</span>,
-    enableSorting: false,
+    accessorKey: "nombre_empresa",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Empresa" />,
+    cell: ({ row }) => <div className="w-[200px] truncate font-medium">{row.original.nombre_empresa}</div>,
     enableHiding: false,
   },
   {
-    accessorKey: "name",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
-    cell: ({ row }) => <span>{row.original.name}</span>,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "company",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Company" />,
-    cell: ({ row }) => <span>{row.original.company}</span>,
-    enableSorting: false,
+    accessorKey: "email",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
+    cell: ({ row }) => <div className="w-[200px] truncate">{row.original.email}</div>,
   },
   {
     accessorKey: "status",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
-    cell: ({ row }) => <Badge variant="secondary">{row.original.status}</Badge>,
-    enableSorting: false,
+    cell: ({ row }) => {
+      const status = row.original.status;
+
+      if (!status) {
+        return <Badge style={{ backgroundColor: defaultColor, color: "white", border: "none" }}>Sin estado</Badge>;
+      }
+
+      const formattedStatus = status.charAt(0).toUpperCase() + status.slice(1);
+      // @ts-expect-error - The key is a dynamic string from the DB, but defaultColor handles the fallback.
+      // eslint-disable-next-line security/detect-object-injection
+      const color = channelColorMap[formattedStatus] ?? defaultColor;
+      return <Badge style={{ backgroundColor: color, color: "white", border: "none" }}>{status}</Badge>;
+    },
   },
   {
-    accessorKey: "source",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Source" />,
-    cell: ({ row }) => <Badge variant="outline">{row.original.source}</Badge>,
-    enableSorting: false,
+    accessorKey: "pais",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="País" />,
+    cell: ({ row }) => <span>{row.original.pais}</span>,
   },
   {
-    accessorKey: "lastActivity",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Last Activity" />,
-    cell: ({ row }) => <span className="text-muted-foreground tabular-nums">{row.original.lastActivity}</span>,
-    enableSorting: false,
+    accessorKey: "timestamp_registro",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Registrado" />,
+    cell: ({ row }) => {
+      const date = new Date(row.original.timestamp_registro);
+      const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+      return <span className="text-muted-foreground tabular-nums">{formattedDate}</span>;
+    },
   },
   {
     id: "actions",

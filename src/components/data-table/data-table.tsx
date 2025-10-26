@@ -55,7 +55,7 @@ function renderTableBody<TData, TValue>({
       </SortableContext>
     );
   }
-  return table.getRowModel().rows.map((row) => (
+  return table.getPaginationRowModel().rows.map((row) => (
     <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
       {row.getVisibleCells().map((cell) => (
         <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
@@ -76,6 +76,7 @@ export function DataTable<TData, TValue>({
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (active && over && active.id !== over.id && onReorder) {
       const oldIndex = dataIds.indexOf(active.id);
       const newIndex = dataIds.indexOf(over.id);
