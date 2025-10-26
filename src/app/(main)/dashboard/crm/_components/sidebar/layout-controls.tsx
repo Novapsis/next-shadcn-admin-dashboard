@@ -21,6 +21,10 @@ type LayoutControlsProps = {
   readonly navbarStyle: NavbarStyle;
 };
 
+function isThemeMode(value: string): value is ThemeMode {
+  return value === "light" || value === "dark";
+}
+
 export function LayoutControls(props: LayoutControlsProps) {
   const { variant, collapsible, contentLayout, navbarStyle } = props;
 
@@ -31,8 +35,10 @@ export function LayoutControls(props: LayoutControlsProps) {
 
   const handleValueChange = async (key: string, value: string) => {
     if (key === "theme_mode") {
-      updateThemeMode(value);
-      setThemeMode(value as ThemeMode);
+      if (isThemeMode(value)) {
+        updateThemeMode(value);
+        setThemeMode(value);
+      }
     }
 
     if (key === "theme_preset") {
