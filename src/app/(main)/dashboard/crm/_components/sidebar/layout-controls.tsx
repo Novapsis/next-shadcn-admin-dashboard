@@ -11,8 +11,33 @@ import { updateContentLayout, updateNavbarStyle } from "@/lib/layout-utils";
 import { updateThemeMode, updateThemePreset } from "@/lib/theme-utils";
 import { setValueToCookie } from "@/server/server-actions";
 import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
-import type { SidebarVariant, SidebarCollapsible, ContentLayout, NavbarStyle } from "@/types/preferences/layout";
-import { THEME_PRESET_OPTIONS, type ThemePreset, type ThemeMode } from "@/types/preferences/theme";
+import {
+  CONTENT_LAYOUT_VALUES,
+  NAVBAR_STYLE_VALUES,
+  SIDEBAR_COLLAPSIBLE_VALUES,
+  SIDEBAR_VARIANT_VALUES,
+} from "@/types/preferences/layout";
+import { THEME_PRESET_OPTIONS, THEME_PRESET_VALUES, type ThemePreset, type ThemeMode } from "@/types/preferences/theme";
+
+// Type Guards
+function isThemeMode(value: string): value is ThemeMode {
+  return value === "light" || value === "dark";
+}
+function isThemePreset(value: string): value is ThemePreset {
+  return (THEME_PRESET_VALUES as readonly string[]).includes(value);
+}
+function isContentLayout(value: string): value is ContentLayout {
+  return (CONTENT_LAYOUT_VALUES as readonly string[]).includes(value);
+}
+function isNavbarStyle(value: string): value is NavbarStyle {
+  return (NAVBAR_STYLE_VALUES as readonly string[]).includes(value);
+}
+function isSidebarVariant(value: string): value is SidebarVariant {
+  return (SIDEBAR_VARIANT_VALUES as readonly string[]).includes(value);
+}
+function isSidebarCollapsible(value: string): value is SidebarCollapsible {
+  return (SIDEBAR_COLLAPSIBLE_VALUES as readonly string[]).includes(value);
+}
 
 type LayoutControlsProps = {
   readonly variant: SidebarVariant;
@@ -20,10 +45,6 @@ type LayoutControlsProps = {
   readonly contentLayout: ContentLayout;
   readonly navbarStyle: NavbarStyle;
 };
-
-function isThemeMode(value: string): value is ThemeMode {
-  return value === "light" || value === "dark";
-}
 
 export function LayoutControls(props: LayoutControlsProps) {
   const { variant, collapsible, contentLayout, navbarStyle } = props;
@@ -33,27 +54,36 @@ export function LayoutControls(props: LayoutControlsProps) {
   const themePreset = usePreferencesStore((s) => s.themePreset);
   const setThemePreset = usePreferencesStore((s) => s.setThemePreset);
 
+  // eslint-disable-next-line complexity
   const handleValueChange = async (key: string, value: string) => {
-    if (key === "theme_mode") {
-      if (isThemeMode(value)) {
-        updateThemeMode(value);
-        setThemeMode(value);
-      }
+    if (key === "theme_mode" && isThemeMode(value)) {
+      updateThemeMode(value);
+      setThemeMode(value);
     }
 
-    if (key === "theme_preset") {
+    if (key === "theme_preset" && isThemePreset(value)) {
       updateThemePreset(value);
-      setThemePreset(value as ThemePreset);
+      setThemePreset(value);
     }
 
-    if (key === "content_layout") {
+    if (key === "content_layout" && isContentLayout(value)) {
       updateContentLayout(value);
     }
 
-    if (key === "navbar_style") {
+    if (key === "navbar_style" && isNavbarStyle(value)) {
       updateNavbarStyle(value);
     }
+
+    // These settings are saved to a cookie and applied on next page load.
+    if (isSidebarVariant(value) || isSidebarCollapsible(value)) {
+      // No client-side update function needed, just save to cookie.
+    }
+
     await setValueToCookie(key, value);
+    // Reload the page for server-side props to take effect
+    if (key === "sidebar_variant" || key === "sidebar_collapsible") {
+      window.location.reload();
+    }
   };
 
   return (
