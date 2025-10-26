@@ -47,7 +47,6 @@ export const recentLeadsColumns: ColumnDef<Lead>[] = [
       }
 
       const formattedStatus = status.charAt(0).toUpperCase() + status.slice(1);
-      // @ts-expect-error - The key is a dynamic string from the DB, but defaultColor handles the fallback.
       // eslint-disable-next-line security/detect-object-injection
       const color = channelColorMap[formattedStatus] ?? defaultColor;
       return <Badge style={{ backgroundColor: color, color: "white", border: "none" }}>{status}</Badge>;
