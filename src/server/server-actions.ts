@@ -29,7 +29,7 @@ export async function getPreference<T extends string>(key: string, allowed: read
 }
 
 // eslint-disable-next-line complexity
-export async function getDashboardStats(timeRange: string = "90d") {
+export async function getDashboardStats() {
   const today = new Date();
   const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
   const tomorrowStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString();
@@ -75,50 +75,40 @@ export async function getDashboardStats(timeRange: string = "90d") {
     efficiency = contactedCount > 0 ? (respondedCount / contactedCount) * 100 : 0;
   }
 
-  const startDate = new Date(today);
-  let daysToSubtract = 90;
-  if (timeRange === "30d") {
-    daysToSubtract = 30;
-  } else if (timeRange === "7d") {
-    daysToSubtract = 7;
-  }
-  startDate.setDate(today.getDate() - (daysToSubtract - 1));
-  startDate.setHours(0, 0, 0, 0); // Start of the period
+  const ninetyDaysAgo = new Date(today);
+  ninetyDaysAgo.setDate(today.getDate() - 89);
+  ninetyDaysAgo.setHours(0, 0, 0, 0);
 
   const { data: rangeData, error: rangeError } = await supabase
     .from("leads")
     .select("timestamp_registro")
-    .gte("timestamp_registro", startDate.toISOString())
+    .gte("timestamp_registro", ninetyDaysAgo.toISOString())
     .lte("timestamp_registro", today.toISOString());
 
   if (rangeError) {
-    console.error(`Error fetching leads for time range ${timeRange}:`, rangeError);
+    console.error(`Error fetching leads for time series:`, rangeError);
   }
 
-  // --- New logic for data aggregation ---
   const leadsByDay: { [key: string]: number } = {};
-  // Initialize all days in the range to 0
-  for (let i = 0; i < daysToSubtract; i++) {
-    const d = new Date(startDate);
-    d.setDate(startDate.getDate() + i);
+  for (let i = 0; i < 90; i++) {
+    const d = new Date(ninetyDaysAgo);
+    d.setDate(d.getDate() + i);
     const key = d.toISOString().split("T")[0]; // YYYY-MM-DD
-    // eslint-disable-next-line security/detect-object-injection
     leadsByDay[key] = 0;
   }
 
   if (rangeData) {
     for (const item of rangeData) {
-      const key = (item.timestamp_registro as string).split("T")[0]; // YYYY-MM-DD
+      const key = (item.timestamp_registro as string).split("T")[0];
       if (Object.prototype.hasOwnProperty.call(leadsByDay, key)) {
-        // eslint-disable-next-line security/detect-object-injection
         leadsByDay[key]++;
       }
     }
   }
 
-  const weeklyLeads = Object.entries(leadsByDay).map(([date, count]) => ({
-    day: date, // The client will format this
-    value: count,
+  const leadsTimeSeries = Object.entries(leadsByDay).map(([date, count]) => ({
+    date: date,
+    leads: count,
   }));
 
   const result = {
@@ -127,7 +117,7 @@ export async function getDashboardStats(timeRange: string = "90d") {
     todaysLeads: todaysLeads ?? 0,
     leadsByChannel,
     efficiency: efficiency,
-    weeklyLeads,
+    leadsTimeSeries, // Changed from weeklyLeads
   };
 
   console.log("Dashboard Stats:", result);

@@ -6,14 +6,10 @@ import { OverviewCards } from "./_components/overview-cards";
 import { TableCards } from "./_components/table-cards";
 import { WeeklyLeadsCard } from "./_components/weekly-leads-card";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
-  const timeRange = searchParams.range?.toString() ?? "90d";
+export const dynamic = "force-dynamic";
 
-  const [stats, leads] = await Promise.all([getDashboardStats(timeRange), getLeads()]);
+export default async function Page() {
+  const [stats, leads] = await Promise.all([getDashboardStats(), getLeads()]);
 
   return (
     <div className="flex flex-col gap-4 md:gap-6">
@@ -25,7 +21,7 @@ export default async function Page({
       />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
         <InsightCards leadsByChannel={stats.leadsByChannel} />
-        <WeeklyLeadsCard weeklyLeads={stats.weeklyLeads} />
+        <WeeklyLeadsCard leadsTimeSeries={stats.leadsTimeSeries} />
       </div>
       <OperationalCards />
       <TableCards leads={leads} />
