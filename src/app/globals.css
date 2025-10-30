@@ -36,7 +36,7 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
+--color-primary: var(--primary);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -203,5 +203,13 @@
   overflow: visible; /* Or hidden if you want to clip anything outside */
 }
 
+/* Fix for SelectItem highlight in dark mode */
+.dark .radix-themes-select-item[data-highlighted] {
+  background-color: oklch(0.25 0.04 260) !important; /* Darker background */
+  color: oklch(0.95 0.01 90) !important; /* Lighter text */
+}
 
-
+.dark .radix-themes-select-item[data-state="checked"] {
+  background-color: oklch(0.3 0.05 260) !important; /* Even darker for checked */
+  color: oklch(0.95 0.01 90) !important; /* Lighter text */
+}

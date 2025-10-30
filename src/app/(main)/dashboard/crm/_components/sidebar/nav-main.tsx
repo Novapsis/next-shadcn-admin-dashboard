@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -33,8 +32,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { type NavGroup, type NavMainItem } from "@/navigation/sidebar/sidebar-items";
 
 import { LeadScrapingDialog } from "./lead-scraping-dialog";
-
-const SearchDialogComponent = dynamic(() => import("./search-dialog").then((mod) => mod.SearchDialog), { ssr: false });
 
 interface NavMainProps {
   readonly items: readonly NavGroup[];
@@ -179,10 +176,10 @@ export function NavMain({ items }: NavMainProps) {
     let timer: NodeJS.Timeout | undefined;
     if (isEmailSendingActive) {
       timer = setInterval(() => {
-        // setEmailSendingProgress((prev) => (prev >= 100 ? 0 : prev + 20)); // Progress bar is not rendered
+        // Progress bar is not rendered
       }, 800);
     } else {
-      // setEmailSendingProgress(0); // Reset on deactivation, but progress bar is not rendered
+      // Reset on deactivation, but progress bar is not rendered
     }
 
     return () => {

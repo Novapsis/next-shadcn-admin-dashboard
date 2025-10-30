@@ -1,4 +1,4 @@
-import { ChartBar, Bot, History, Send, type LucideIcon } from "lucide-react";
+import { ChartBar, Bot, History, Send, Instagram, type LucideIcon } from "lucide-react";
 
 export interface NavSubItem {
   title: string;
@@ -44,6 +44,11 @@ export const sidebarItems: NavGroup[] = [
         title: "Bandeja de Salida",
         url: "/dashboard/bandeja-salida",
         icon: Send,
+      },
+      {
+        title: "Instagram",
+        url: "/dashboard/instagram",
+        icon: Instagram,
       },
       {
         title: "Historial Email",
