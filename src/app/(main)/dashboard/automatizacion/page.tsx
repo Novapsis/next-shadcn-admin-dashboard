@@ -4,6 +4,7 @@ import { EmailAutomationButton } from "./_components/email-automation-button";
 import { InstagramLeadAutomationButton } from "./_components/instagram-lead-automation-button";
 import { InstagramMessageAutomationButton } from "./_components/instagram-message-automation-button";
 import { LeadSearchAutomationButton } from "./_components/lead-search-automation-button";
+import { InstagramScrapingButton } from "./_components/manual-lead-search-button";
 
 export default function AutomationPage() {
   return (
@@ -25,6 +26,16 @@ export default function AutomationPage() {
         </CardHeader>
         <CardContent>
           <LeadSearchAutomationButton />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Búsqueda Manual de Leads</CardTitle>
+          <CardDescription>Inicia una búsqueda manual de leads a través de Instagram.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <InstagramScrapingButton />
         </CardContent>
       </Card>
 

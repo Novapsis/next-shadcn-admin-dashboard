@@ -1,9 +1,13 @@
 "use client";
 
+import { useState, useEffect, useCallback } from "react";
+
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { MailIcon, ChevronRight } from "lucide-react";
+import { MailIcon, ChevronRight, PowerOff } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -25,9 +29,12 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { type NavGroup, type NavMainItem } from "@/navigation/sidebar/sidebar-items";
 
 import { LeadScrapingDialog } from "./lead-scraping-dialog";
+
+const SearchDialogComponent = dynamic(() => import("./search-dialog").then((mod) => mod.SearchDialog), { ssr: false });
 
 interface NavMainProps {
   readonly items: readonly NavGroup[];
@@ -158,6 +165,60 @@ export function NavMain({ items }: NavMainProps) {
     return subItems?.some((sub) => path.startsWith(sub.url)) ?? false;
   };
 
+  // Logic for the new Email Sending Automation Button
+  const [isEmailSendingActive, setIsEmailSendingActive] = useState(false);
+  const emailSendingWebhookUrl = "https://n8n.novapsis.site/webhook/Activar-envio-correos-ts";
+
+  const fetchEmailSendingStatus = useCallback(async () => {
+    // Placeholder for fetching actual status if needed
+  }, []);
+
+  useEffect(() => {
+    fetchEmailSendingStatus();
+
+    let timer: NodeJS.Timeout | undefined;
+    if (isEmailSendingActive) {
+      timer = setInterval(() => {
+        // setEmailSendingProgress((prev) => (prev >= 100 ? 0 : prev + 20)); // Progress bar is not rendered
+      }, 800);
+    } else {
+      // setEmailSendingProgress(0); // Reset on deactivation, but progress bar is not rendered
+    }
+
+    return () => {
+      if (timer) {
+        clearInterval(timer);
+      }
+    };
+  }, [isEmailSendingActive, fetchEmailSendingStatus]);
+
+  const handleEmailSendingClick = async () => {
+    console.log("Email Sending Button clicked!");
+    console.log("Current isEmailSendingActive state:", isEmailSendingActive);
+    const message = isEmailSendingActive ? "stop" : "start";
+    try {
+      const response = await fetch(emailSendingWebhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message }),
+      });
+
+      if (response.ok) {
+        setIsEmailSendingActive(!isEmailSendingActive);
+        toast.success(
+          `Automatización de envío de correos ${isEmailSendingActive ? "desactivada" : "activada"} correctamente.`,
+        );
+      } else {
+        toast.error("Error al cambiar el estado de la automatización de envío de correos.");
+      }
+    } catch (error) {
+      console.error("Error sending webhook:", error);
+      toast.error("Error de red al contactar el webhook de envío de correos.");
+    }
+  };
+
   return (
     <>
       <SidebarGroup>
@@ -165,14 +226,24 @@ export function NavMain({ items }: NavMainProps) {
           <SidebarMenu>
             <SidebarMenuItem className="flex items-center gap-2">
               <LeadScrapingDialog />
-              <Button
-                size="icon"
-                className="h-9 w-9 shrink-0 group-data-[collapsible=icon]:opacity-0"
-                variant="outline"
-              >
-                <MailIcon />
-                <span className="sr-only">Inbox</span>
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="icon"
+                      className={`h-9 w-9 shrink-0 group-data-[collapsible=icon]:opacity-0 ${isEmailSendingActive ? "group animate-whatsapp-border" : ""}`}
+                      variant={isEmailSendingActive ? "destructive" : "outline"}
+                      onClick={handleEmailSendingClick}
+                    >
+                      {isEmailSendingActive ? <PowerOff className="h-5 w-5" /> : <MailIcon className="h-5 w-5" />}
+                      <span className="sr-only">Activar/Desactivar Envío Automático de Correos</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Activa o desactiva el envío automático de correos pendientes.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroupContent>

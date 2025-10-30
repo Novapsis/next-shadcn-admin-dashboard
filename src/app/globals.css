@@ -96,7 +96,7 @@
   --secondary-foreground: oklch(0.95 0.01 90); /* Light Ivory */
   --muted: oklch(0.25 0.04 260); /* Even Lighter Blue */
   --muted-foreground: oklch(0.7 0.02 90); /* Grayish Ivory */
-  --accent: oklch(0.25 0.04 260); /* Even Lighter Blue */
+  --accent: oklch(0.9 0.02 90); /* Light Grayish Ivory */
   --accent-foreground: oklch(0.95 0.01 90); /* Light Ivory */
   --destructive: oklch(0.7 0.25 25); /* Brighter Red */
   --positive: oklch(0.7 0.2 150); /* Brighter Green */
@@ -165,3 +165,43 @@
 .disable-transitions * {
   transition: none !important;
 }
+
+@keyframes whatsapp-border-animation {
+  0% {
+    border-image: linear-gradient(to right, oklch(0.6 0.2 150) 0%, transparent 20%, transparent 80%, oklch(0.6 0.2 150) 100%) 1;
+    border-width: 2px;
+  }
+  25% {
+    border-image: linear-gradient(to bottom, oklch(0.6 0.2 150) 0%, transparent 20%, transparent 80%, oklch(0.6 0.2 150) 100%) 1;
+    border-width: 2px;
+  }
+  50% {
+    border-image: linear-gradient(to left, oklch(0.6 0.2 150) 0%, transparent 20%, transparent 80%, oklch(0.6 0.2 150) 100%) 1;
+    border-width: 2px;
+  }
+  75% {
+    border-image: linear-gradient(to top, oklch(0.6 0.2 150) 0%, transparent 20%, transparent 80%, oklch(0.6 0.2 150) 100%) 1;
+    border-width: 2px;
+  }
+  100% {
+    border-image: linear-gradient(to right, oklch(0.6 0.2 150) 0%, transparent 20%, transparent 80%, oklch(0.6 0.2 150) 100%) 1;
+    border-width: 2px;
+  }
+}
+
+.group.animate-whatsapp-border .w-full.transition-all {
+  animation: whatsapp-border-animation 4s linear infinite;
+  border: 2px solid transparent; /* Ensure a proper border is present */
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), 0 0 transparent !important; /* Remove other shadows */
+  overflow: hidden; /* Important to contain the border-image */
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure the parent also doesn't clip the border */
+.group.animate-whatsapp-border {
+  overflow: visible; /* Or hidden if you want to clip anything outside */
+}
+
+
+
