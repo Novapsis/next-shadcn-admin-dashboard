@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 import { DataTable } from "@/components/data-table/data-table";
+import { Button } from "@/components/ui/button";
 import { useDataTableInstance } from "@/hooks/use-data-table-instance";
 import { supabase } from "@/lib/supabase";
 
@@ -68,6 +69,20 @@ function InstagramPageClient() {
         Aquí se listan las gestorías encontradas en Instagram mediante scraping.
       </p>
       <DataTable key={data.length} table={table} columns={tableColumns} />
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+          Anterior
+        </Button>
+        <span>
+          Página{" "}
+          <strong>
+            {table.getState().pagination.pageIndex + 1} de {table.getPageCount()}
+          </strong>
+        </span>
+        <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+          Siguiente
+        </Button>
+      </div>
       <InstagramDetailModal isOpen={isModalOpen} onClose={handleCloseModal} entryData={selectedEntry} />
     </div>
   );
