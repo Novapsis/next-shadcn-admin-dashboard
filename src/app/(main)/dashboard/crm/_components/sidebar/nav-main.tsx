@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useTransition } from "react";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { type NavGroup, type NavMainItem } from "@/navigation/sidebar/sidebar-items";
+import { getAutomationState, updateAutomationState } from "@/server/automation-actions";
 
 import { LeadScrapingDialog } from "./lead-scraping-dialog";
 
@@ -164,34 +165,19 @@ export function NavMain({ items }: NavMainProps) {
 
   // Logic for the new Email Sending Automation Button
   const [isEmailSendingActive, setIsEmailSendingActive] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const emailSendingWebhookUrl = "https://n8n.novapsis.site/webhook/Activar-envio-correos-ts";
-
-  const fetchEmailSendingStatus = useCallback(async () => {
-    // Placeholder for fetching actual status if needed
-  }, []);
+  const automationId = "email_sending_automation";
 
   useEffect(() => {
-    fetchEmailSendingStatus();
-
-    let timer: NodeJS.Timeout | undefined;
-    if (isEmailSendingActive) {
-      timer = setInterval(() => {
-        // Progress bar is not rendered
-      }, 800);
-    } else {
-      // Reset on deactivation, but progress bar is not rendered
+    async function fetchInitialState() {
+      const initialState = await getAutomationState(automationId);
+      setIsEmailSendingActive(initialState);
     }
-
-    return () => {
-      if (timer) {
-        clearInterval(timer);
-      }
-    };
-  }, [isEmailSendingActive, fetchEmailSendingStatus]);
+    fetchInitialState();
+  }, []);
 
   const handleEmailSendingClick = async () => {
-    console.log("Email Sending Button clicked!");
-    console.log("Current isEmailSendingActive state:", isEmailSendingActive);
     const message = isEmailSendingActive ? "stop" : "start";
     try {
       const response = await fetch(emailSendingWebhookUrl, {
@@ -203,10 +189,12 @@ export function NavMain({ items }: NavMainProps) {
       });
 
       if (response.ok) {
-        setIsEmailSendingActive(!isEmailSendingActive);
-        toast.success(
-          `Automatización de envío de correos ${isEmailSendingActive ? "desactivada" : "activada"} correctamente.`,
-        );
+        const newIsActive = !isEmailSendingActive;
+        setIsEmailSendingActive(newIsActive);
+        startTransition(() => {
+          updateAutomationState(automationId, newIsActive);
+        });
+        toast.success(`Automatización de envío de correos ${newIsActive ? "activada" : "desactivada"} correctamente.`);
       } else {
         toast.error("Error al cambiar el estado de la automatización de envío de correos.");
       }
@@ -231,6 +219,7 @@ export function NavMain({ items }: NavMainProps) {
                       className={`h-9 w-9 shrink-0 group-data-[collapsible=icon]:opacity-0 ${isEmailSendingActive ? "group animate-whatsapp-border" : ""}`}
                       variant={isEmailSendingActive ? "destructive" : "outline"}
                       onClick={handleEmailSendingClick}
+                      disabled={isPending}
                     >
                       {isEmailSendingActive ? <PowerOff className="h-5 w-5" /> : <MailIcon className="h-5 w-5" />}
                       <span className="sr-only">Activar/Desactivar Envío Automático de Correos</span>

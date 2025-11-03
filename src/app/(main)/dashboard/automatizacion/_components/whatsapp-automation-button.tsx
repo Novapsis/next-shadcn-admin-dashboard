@@ -9,12 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { getAutomationState, updateAutomationState } from "@/server/automation-actions";
 
-export function EmailAutomationButton() {
+export function WhatsAppAutomationButton() {
   const [isActive, setIsActive] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isPending, startTransition] = useTransition();
-  const webhookUrl = "https://n8n.novapsis.site/webhook/tax-activate";
-  const automationId = "email_automation";
+  const webhookUrl = "https://n8n.novapsis.site/webhook/tax-solutions-whatapp-send-message";
+  const automationId = "whatsapp";
 
   useEffect(() => {
     async function fetchInitialState() {
@@ -28,8 +28,8 @@ export function EmailAutomationButton() {
     let timer: NodeJS.Timeout | undefined;
     if (isActive) {
       timer = setInterval(() => {
-        setProgress((prev) => (prev >= 100 ? 0 : prev + 20));
-      }, 800);
+        setProgress((prev) => (prev >= 100 ? 0 : prev + 10));
+      }, 600);
     } else {
       clearInterval(timer);
     }
@@ -61,9 +61,9 @@ export function EmailAutomationButton() {
         startTransition(() => {
           updateAutomationState(automationId, newIsActive);
         });
-        toast.success(`Automatización de correos ${newIsActive ? "activada" : "desactivada"} correctamente.`);
+        toast.success(`Envío automático de WhatsApp ${newIsActive ? "activado" : "desactivado"} correctamente.`);
       } else {
-        toast.error("Error al cambiar el estado de la automatización.");
+        toast.error("Error al cambiar el estado del envío automático de WhatsApp.");
       }
     } catch (error) {
       console.error("Error sending webhook:", error);
@@ -76,11 +76,11 @@ export function EmailAutomationButton() {
       <Button
         onClick={handleClick}
         variant={isActive ? "destructive" : "default"}
-        className={`w-full transition-all duration-300 ${isActive ? "shadow-lg shadow-red-500/50" : "shadow-lg shadow-green-500/50"}`}
+        className={`transition-all duration-300 ${isActive ? "shadow-lg shadow-red-500/50" : "shadow-lg shadow-green-500/50"}`}
         disabled={isPending}
       >
         {isActive ? <PowerOff className="mr-2 h-4 w-4" /> : <Power className="mr-2 h-4 w-4" />}
-        {isActive ? "Desactivar" : "Activar"} Automatización
+        {isActive ? "Desactivar" : "Activar"} Envío Automático
       </Button>
       {isActive && (
         <div className="relative pt-1">

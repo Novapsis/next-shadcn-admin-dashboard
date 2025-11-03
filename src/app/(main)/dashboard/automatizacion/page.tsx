@@ -5,6 +5,7 @@ import { InstagramLeadAutomationButton } from "./_components/instagram-lead-auto
 import { InstagramMessageAutomationButton } from "./_components/instagram-message-automation-button";
 import { LeadSearchAutomationButton } from "./_components/lead-search-automation-button";
 import { InstagramScrapingButton } from "./_components/manual-lead-search-button";
+import { WhatsAppAutomationButton } from "./_components/whatsapp-automation-button";
 
 export default function AutomationPage() {
   return (
@@ -26,6 +27,16 @@ export default function AutomationPage() {
         </CardHeader>
         <CardContent>
           <LeadSearchAutomationButton />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Automatización de WhatsApp</CardTitle>
+          <CardDescription>Activa o desactiva el envío automático de mensajes por WhatsApp.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <WhatsAppAutomationButton />
         </CardContent>
       </Card>
 
