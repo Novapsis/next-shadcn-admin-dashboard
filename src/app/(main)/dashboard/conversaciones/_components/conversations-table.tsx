@@ -63,8 +63,8 @@ export function ConversationsTable({ data }: ConversationsTableProps) {
         <div className="flex items-center justify-between">
           <Input
             placeholder="Filtrar por cliente..."
-            value={(table.getColumn("nombre").getFilterValue() as string | undefined) ?? ""}
-            onChange={(event) => table.getColumn("nombre").setFilterValue(event.target.value)}
+            value={(table.getColumn("nombre")?.getFilterValue() as string | undefined) ?? ""}
+            onChange={(event) => table.getColumn("nombre")?.setFilterValue(event.target.value)}
             className="max-w-sm"
           />
           <ClientOnly>
