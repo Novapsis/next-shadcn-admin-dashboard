@@ -1,22 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import * as React from "react";
 
 interface ClientOnlyProps {
   children: React.ReactNode;
+  fallback?: React.ReactNode;
 }
 
-export function ClientOnly({ children }: ClientOnlyProps) {
-  const [hasMounted, setHasMounted] = useState(false);
+export function ClientOnly({ children, fallback = null }: ClientOnlyProps) {
+  const [isClient, setIsClient] = React.useState(false);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setHasMounted(true);
+  React.useEffect(() => {
+    setIsClient(true);
   }, []);
 
-  if (!hasMounted) {
-    return null;
-  }
-
-  return <>{children}</>;
+  return isClient ? <>{children}</> : <>{fallback}</>;
 }

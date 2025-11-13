@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { cookies } from "next/headers";
 
 import { ClientSidebarWrapper } from "@/app/(main)/dashboard/_components/client-sidebar-wrapper";
+import { ClientOnly } from "@/components/client-only";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { users } from "@/data/users";
@@ -66,12 +67,16 @@ export default async function Layout({ children }: Readonly<{ children: ReactNod
             <div className="flex items-center gap-1 lg:gap-2">
               <SidebarTrigger className="-ml-1" />
               <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
-              <SearchDialog />
+              <ClientOnly>
+                <SearchDialog />
+              </ClientOnly>
             </div>
             <div className="flex items-center gap-2">
-              <LayoutControls {...layoutPreferences} />
-              <ThemeSwitcher />
-              <AccountSwitcher users={users} />
+              <ClientOnly>
+                <LayoutControls {...layoutPreferences} />
+                <ThemeSwitcher />
+                <AccountSwitcher users={users} />
+              </ClientOnly>
             </div>
           </div>
         </header>

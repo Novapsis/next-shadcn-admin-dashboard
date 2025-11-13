@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { type ColumnDef } from "@tanstack/react-table";
 
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
@@ -8,11 +10,7 @@ import { Button } from "@/components/ui/button";
 
 import { type Conversation } from "../types";
 
-interface CreateColumnsProps {
-  onShowHistory: (conversation: Conversation) => void;
-}
-
-export const columns = ({ onShowHistory }: CreateColumnsProps): ColumnDef<Conversation>[] => [
+export const columns = (): ColumnDef<Conversation>[] => [
   {
     accessorKey: "nombre",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Cliente" />,
@@ -55,7 +53,9 @@ export const columns = ({ onShowHistory }: CreateColumnsProps): ColumnDef<Conver
 
       return (
         <div className="text-right">
-          <Button onClick={() => onShowHistory(conversation)}>Ver Historial</Button>
+          <Button asChild>
+            <Link href={`/dashboard/conversaciones/${conversation.id}`}>Ver Historial</Link>
+          </Button>
         </div>
       );
     },

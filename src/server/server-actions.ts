@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 
+import { type Conversation } from "@/app/(main)/dashboard/conversaciones/types";
 import { supabase } from "@/lib/supabase";
 
 export async function getValueFromCookie(key: string): Promise<string | undefined> {
@@ -61,7 +62,7 @@ export async function getDashboardStats() {
   const leadsByChannel = leadsByChannelData
     ? leadsByChannelData.reduce((acc: { [key: string]: number }, { status }) => {
         if (status) {
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, security/detect-object-injection
+          // eslint-disable-next-line security/detect-object-injection
           acc[status] = (acc[status] ?? 0) + 1;
         }
         return acc;
@@ -101,6 +102,7 @@ export async function getDashboardStats() {
     for (const item of rangeData) {
       const key = (item.timestamp_registro as string).split("T")[0];
       if (Object.prototype.hasOwnProperty.call(leadsByDay, key)) {
+        // eslint-disable-next-line security/detect-object-injection
         leadsByDay[key]++;
       }
     }
@@ -161,4 +163,18 @@ export async function getConversations() {
   }
 
   return data;
+}
+
+export async function getConversationById(id: string) {
+  const { data, error } = await supabase.rpc("get_conversations_with_messages");
+
+  if (error) {
+    console.error(`Error fetching conversation with ID ${id}:`, error);
+    return null;
+  }
+
+  // Assuming the RPC returns an array of conversations, find the one with the matching ID
+  const conversation = data.find((c: Conversation) => c.id === id);
+
+  return conversation ?? null;
 }
