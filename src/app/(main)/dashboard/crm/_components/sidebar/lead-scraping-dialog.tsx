@@ -21,119 +21,7 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
-
-const countries = [
-  // Europe
-  { value: "es", label: "España" },
-  { value: "pt", label: "Portugal" },
-  { value: "ad", label: "Andorra" },
-  { value: "fr", label: "Francia" },
-  { value: "it", label: "Italia" },
-  // North America
-  { value: "us", label: "United States" },
-  { value: "ca", label: "Canada" },
-  { value: "mx", label: "Mexico" },
-  // South America
-  { value: "ar", label: "Argentina" },
-  { value: "br", label: "Brazil" },
-  { value: "co", label: "Colombia" },
-  { value: "cl", label: "Chile" },
-  { value: "pe", label: "Peru" },
-];
-
-const citiesByCountry: Record<string, { value: string; label: string }[]> = {
-  es: [
-    { value: "madrid", label: "Madrid" },
-    { value: "barcelona", label: "Barcelona" },
-    { value: "valencia", label: "Valencia" },
-    { value: "sevilla", label: "Sevilla" },
-    { value: "zaragoza", label: "Zaragoza" },
-  ],
-  pt: [
-    { value: "lisbon", label: "Lisboa" },
-    { value: "porto", label: "Oporto" },
-    { value: "coimbra", label: "Coimbra" },
-    { value: "braga", label: "Braga" },
-    { value: "faro", label: "Faro" },
-  ],
-  ad: [
-    { value: "andorra la vella", label: "Andorra la Vella" },
-    { value: "escaldes-engordany", label: "Escaldes-Engordany" },
-    { value: "encamp", label: "Encamp" },
-    { value: "sant julia de loria", label: "Sant Julià de Lòria" },
-    { value: "la massana", label: "La Massana" },
-  ],
-  fr: [
-    { value: "paris", label: "Paris" },
-    { value: "marseille", label: "Marsella" },
-    { value: "lyon", label: "Lyon" },
-    { value: "toulouse", label: "Toulouse" },
-    { value: "nice", label: "Niza" },
-  ],
-  it: [
-    { value: "rome", label: "Roma" },
-    { value: "milan", label: "Milán" },
-    { value: "naples", label: "Nápoles" },
-    { value: "turin", label: "Turín" },
-    { value: "palermo", label: "Palermo" },
-  ],
-  us: [
-    { value: "new york", label: "New York" },
-    { value: "los angeles", label: "Los Angeles" },
-    { value: "chicago", label: "Chicago" },
-    { value: "houston", label: "Houston" },
-    { value: "phoenix", label: "Phoenix" },
-  ],
-  ca: [
-    { value: "toronto", label: "Toronto" },
-    { value: "montreal", label: "Montreal" },
-    { value: "vancouver", label: "Vancouver" },
-    { value: "calgary", label: "Calgary" },
-    { value: "ottawa", label: "Ottawa" },
-  ],
-  mx: [
-    { value: "mexico city", label: "Ciudad de México" },
-    { value: "tijuana", label: "Tijuana" },
-    { value: "ecatepec", label: "Ecatepec" },
-    { value: "leon", label: "León" },
-    { value: "puebla", label: "Puebla" },
-  ],
-  ar: [
-    { value: "buenos aires", label: "Buenos Aires" },
-    { value: "cordoba", label: "Córdoba" },
-    { value: "rosario", label: "Rosario" },
-    { value: "mendoza", label: "Mendoza" },
-    { value: "la plata", label: "La Plata" },
-  ],
-  br: [
-    { value: "sao paulo", label: "São Paulo" },
-    { value: "rio de janeiro", label: "Rio de Janeiro" },
-    { value: "salvador", label: "Salvador" },
-    { value: "brasilia", label: "Brasília" },
-    { value: "fortaleza", label: "Fortaleza" },
-  ],
-  co: [
-    { value: "bogota", label: "Bogotá" },
-    { value: "medellin", label: "Medellín" },
-    { value: "cali", label: "Cali" },
-    { value: "barranquilla", label: "Barranquilla" },
-    { value: "cartagena", label: "Cartagena" },
-  ],
-  cl: [
-    { value: "santiago", label: "Santiago" },
-    { value: "valparaiso", label: "Valparaíso" },
-    { value: "concepcion", label: "Concepción" },
-    { value: "la serena", label: "La Serena" },
-    { value: "antofagasta", label: "Antofagasta" },
-  ],
-  pe: [
-    { value: "lima", label: "Lima" },
-    { value: "arequipa", label: "Arequipa" },
-    { value: "trujillo", label: "Trujillo" },
-    { value: "chiclayo", label: "Chiclayo" },
-    { value: "piura", label: "Piura" },
-  ],
-};
+import { countries, citiesByCountry } from "@/data/locations";
 
 export function LeadScrapingDialog() {
   const [country, setCountry] = useState("");
@@ -245,7 +133,7 @@ export function LeadScrapingDialog() {
                 <PopoverContent className="p-0">
                   <Command>
                     <CommandInput placeholder="Buscar ciudad..." onValueChange={setCity} />
-                    <CommandList>
+                    <CommandList className="[box-shadow:inset_0_10px_8px_-8px_hsl(var(--muted)),_inset_0_-10px_8px_-8px_hsl(var(--muted))]">
                       <CommandEmpty>No se encontró la ciudad.</CommandEmpty>
                       <CommandGroup>
                         {currentCities.map((c) => (
@@ -256,6 +144,7 @@ export function LeadScrapingDialog() {
                               setCity(currentValue === city ? "" : currentValue);
                               setPopoverOpen(false);
                             }}
+                            className="data-[selected=true]:text-primary-foreground data-[selected=true]:bg-primary"
                           >
                             {c.label}
                           </CommandItem>

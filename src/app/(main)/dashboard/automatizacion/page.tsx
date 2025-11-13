@@ -5,6 +5,7 @@ import { InstagramLeadAutomationButton } from "./_components/instagram-lead-auto
 import { InstagramMessageAutomationButton } from "./_components/instagram-message-automation-button";
 import { LeadSearchAutomationButton } from "./_components/lead-search-automation-button";
 import { InstagramScrapingButton } from "./_components/manual-lead-search-button";
+import { ProLeadSearchAutomationButton } from "./_components/pro-lead-search-automation-button";
 import { WhatsAppAutomationButton } from "./_components/whatsapp-automation-button";
 
 export default function AutomationPage() {
@@ -27,6 +28,18 @@ export default function AutomationPage() {
         </CardHeader>
         <CardContent>
           <LeadSearchAutomationButton />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Búsqueda Automática Pro</CardTitle>
+          <CardDescription>
+            Activa o desactiva la búsqueda automática más profesional y detallada de nuevos leads.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ProLeadSearchAutomationButton />
         </CardContent>
       </Card>
 

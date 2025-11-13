@@ -151,3 +151,14 @@ export async function getSentEmails() {
 
   return emails;
 }
+
+export async function getConversations() {
+  const { data, error } = await supabase.rpc("get_conversations_with_messages");
+
+  if (error) {
+    console.error("Error fetching conversations:", error);
+    return [];
+  }
+
+  return data;
+}
