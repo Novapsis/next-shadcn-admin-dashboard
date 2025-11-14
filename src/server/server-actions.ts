@@ -154,27 +154,83 @@ export async function getSentEmails() {
   return emails;
 }
 
-export async function getConversations() {
-  const { data, error } = await supabase.rpc("get_conversations_with_messages");
+export async function getConversations(): Promise<Conversation[]> {
+  const { data, error } = await supabase.from("clientes").select(`
+      id,
+      nombre,
+      leads:leads!source_lead_id (
+        status,
+        nicho_busqueda,
+        ubicacion_busqueda,
+        platform_source
+      ),
+      mensajes (
+        id,
+        contenido,
+        emisor,
+        timestamp
+      )
+    `);
 
   if (error) {
     console.error("Error fetching conversations:", error);
     return [];
   }
 
-  return data;
+  const conversations: Conversation[] = data.map((cliente: any) => ({
+    id: cliente.id,
+    nombre: cliente.nombre,
+    mensajes: cliente.mensajes ?? [],
+    // The lead data is nested inside the 'leads' property
+    ubicacion_busqueda: cliente.leads?.ubicacion_busqueda,
+    nicho_busqueda: cliente.leads?.nicho_busqueda,
+    platform_source: cliente.leads?.platform_source ?? cliente.leads?.status,
+  }));
+
+  return conversations;
 }
 
-export async function getConversationById(id: string) {
-  const { data, error } = await supabase.rpc("get_conversations_with_messages");
+export async function getConversationById(id: string): Promise<Conversation | null> {
+  const { data: clienteData, error: clienteError } = await supabase
+    .from("clientes")
+    .select(
+      `
+      id,
+      nombre,
+      leads:leads!source_lead_id (
+        status,
+        nicho_busqueda,
+        ubicacion_busqueda,
+        platform_source
+      ),
+      mensajes (
+        id,
+        contenido,
+        emisor,
+        timestamp
+      )
+    `,
+    )
+    .eq("id", id)
+    .single();
 
-  if (error) {
-    console.error(`Error fetching conversation with ID ${id}:`, error);
+  if (clienteError) {
+    console.error(`Error fetching cliente/conversation with ID ${id}:`, clienteError);
     return null;
   }
 
-  // Assuming the RPC returns an array of conversations, find the one with the matching ID
-  const conversation = data.find((c: Conversation) => c.id === id);
+  if (!clienteData) {
+    return null;
+  }
 
-  return conversation ?? null;
+  const conversation: Conversation = {
+    id: clienteData.id,
+    nombre: clienteData.nombre,
+    mensajes: clienteData.mensajes ?? [],
+    ubicacion_busqueda: clienteData.leads?.ubicacion_busqueda,
+    nicho_busqueda: clienteData.leads?.nicho_busqueda,
+    platform_source: clienteData.leads?.platform_source ?? clienteData.leads?.status,
+  };
+
+  return conversation;
 }
