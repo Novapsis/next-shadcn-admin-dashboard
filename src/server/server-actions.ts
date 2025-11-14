@@ -177,15 +177,17 @@ export async function getConversations(): Promise<Conversation[]> {
     return [];
   }
 
-  const conversations: Conversation[] = data.map((cliente: any) => ({
-    id: cliente.id,
-    nombre: cliente.nombre,
-    mensajes: cliente.mensajes ?? [],
-    // The lead data is nested inside the 'leads' property
-    ubicacion_busqueda: cliente.leads?.ubicacion_busqueda,
-    nicho_busqueda: cliente.leads?.nicho_busqueda,
-    platform_source: cliente.leads?.platform_source ?? cliente.leads?.status,
-  }));
+  const conversations: Conversation[] = data.map((cliente: any) => {
+    const lead = Array.isArray(cliente.leads) ? cliente.leads[0] : cliente.leads;
+    return {
+      id: cliente.id,
+      nombre: cliente.nombre,
+      mensajes: cliente.mensajes ?? [],
+      ubicacion_busqueda: lead?.ubicacion_busqueda,
+      nicho_busqueda: lead?.nicho_busqueda,
+      platform_source: lead?.platform_source ?? lead?.status,
+    };
+  });
 
   return conversations;
 }
@@ -223,13 +225,14 @@ export async function getConversationById(id: string): Promise<Conversation | nu
     return null;
   }
 
+  const lead = Array.isArray(clienteData.leads) ? clienteData.leads[0] : clienteData.leads;
   const conversation: Conversation = {
     id: clienteData.id,
     nombre: clienteData.nombre,
     mensajes: clienteData.mensajes ?? [],
-    ubicacion_busqueda: clienteData.leads?.ubicacion_busqueda,
-    nicho_busqueda: clienteData.leads?.nicho_busqueda,
-    platform_source: clienteData.leads?.platform_source ?? clienteData.leads?.status,
+    ubicacion_busqueda: lead?.ubicacion_busqueda,
+    nicho_busqueda: lead?.nicho_busqueda,
+    platform_source: lead?.platform_source ?? lead?.status,
   };
 
   return conversation;
